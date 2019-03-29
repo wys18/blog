@@ -1,5 +1,5 @@
 """
-WSGI config for blog project.
+WSGI config for typeidea project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 profile = os.environ.get('RUN_MOD', 'develop')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blog.settings.{}".format(profile))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "typeidea.settings.{}".format(profile))
 
 
 application = get_wsgi_application()
