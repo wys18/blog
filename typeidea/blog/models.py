@@ -21,6 +21,9 @@ class Category(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = '分类'
 
+    def __str__(self):
+        return self.name
+
 
 class Tag(models.Model):
     """标签表"""
@@ -36,7 +39,10 @@ class Tag(models.Model):
     created_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
 
     class Meta:
-        verbose_name = verbose_name_plural = "状态"
+        verbose_name = verbose_name_plural = "标签"
+
+    def __str__(self):
+        return self.name
 
 
 class Post(models.Model):
@@ -62,3 +68,5 @@ class Post(models.Model):
         verbose_name = verbose_name_plural = "文章"
         ordering = ['-id']  # 根据id进行降序排列
 
+    def __str__(self):
+        return self.title
