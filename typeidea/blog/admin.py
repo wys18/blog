@@ -6,14 +6,36 @@ from django.utils.html import format_html
 from .models import Category, Post, Tag
 
 
+class CategoryOwnerFilter(admin.SimpleListFilter):
+    """
+    自定义过滤器只展示当前用户分类
+    """
+    title = '分类过滤器'
+    parameter_name = 'owner_category'
+
+    def lookups(self, request, model_admin):
+        return Category.objects.filter(owner=request.user).values_list('id', 'name')
+
+    def queryset(self, request, queryset):
+        category_id = self.value()
+        if category_id:
+            return queryset.filter(category_id=self.value())
+        return queryset
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'status', 'is_nav', 'created_time', 'post_count')
+    list_display = ('name', 'status', 'is_nav', 'created_time', 'post_count', 'owner')
     fields = ('name', 'status', 'is_nav', 'owner')
+    list_filter = [CategoryOwnerFilter]
 
     def save_model(self, request, obj, form, change):
         obj.owner = request.user
         return super(CategoryAdmin, self).save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(owner=request.user)
 
     def post_count(self, obj):
         """统计该分类下的文章数量"""
@@ -30,6 +52,7 @@ class TagAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.owner = request.user
         return super(TagAdmin, self).save_model(request, obj, form, change)
+
 
 
 @admin.register(Post)
@@ -63,6 +86,10 @@ class PostAdmin(admin.ModelAdmin):
 
     operator.short_description = '操作'
 
-    # def save_model(self, request, obj, form, change):
-    #     obj.owner = request.user
-    #     return super(PostAdmin, self).save_model(request, obj, form, change)
+    def save_model(self, request, obj, form, change):
+        obj.owner = request.user
+        return super(PostAdmin, self).save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(owner=request.user)
